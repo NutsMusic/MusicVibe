@@ -1,0 +1,1371 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Vibe Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@300;400;500;700;900&display=swap" rel="stylesheet">
+<link href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#07070e;--bg2:#0d0d1a;--bg3:#131323;--card:#0f0f1e;--card2:#161628;
+  --b1:rgba(255,255,255,.06);--b2:rgba(255,255,255,.11);--b3:rgba(255,255,255,.18);
+  --tx:#e8e8f4;--mu:#5858a0;--mu2:#9090c0;
+  --pu:#a78bfa;--pu2:#7c3aed;--pu3:#4c1d95;
+  --gr:#34d399;--gr2:#065f46;
+  --am:#fbbf24;--re:#f87171;--bl:#60a5fa;--pk:#f472b6;--cy:#22d3ee;
+  --r:10px;--r2:16px;
+}
+html,body{min-height:100%;background:var(--bg);color:var(--tx);font-family:'Vazirmatn',sans-serif;font-size:14px}
+/* LAYOUT */
+.layout{display:flex;min-height:100vh}
+.sidebar{width:230px;background:var(--bg2);border-left:.5px solid var(--b1);display:flex;flex-direction:column;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
+.main{flex:1;overflow-y:auto}
+/* SIDEBAR */
+.sb-logo{padding:18px;border-bottom:.5px solid var(--b1);display:flex;align-items:center;gap:10px}
+.sb-logo-txt{font-size:20px;font-weight:900;letter-spacing:-1px}
+.sb-logo-txt em{color:var(--pu);font-style:normal}
+.sb-admin{font-size:10px;background:rgba(248,113,113,.15);color:var(--re);border-radius:6px;padding:2px 8px;font-weight:600}
+.sb-nav{flex:1;padding:8px 0}
+.sb-sec{font-size:9px;font-weight:700;color:var(--mu);letter-spacing:1.5px;text-transform:uppercase;padding:12px 16px 5px}
+.sb-item{display:flex;align-items:center;gap:9px;padding:9px 16px;cursor:pointer;color:var(--mu2);font-size:13px;transition:all .13s;border-right:2px solid transparent;position:relative}
+.sb-item:hover{background:rgba(167,139,250,.07);color:var(--tx)}
+.sb-item.on{background:rgba(167,139,250,.12);color:var(--pu);border-right-color:var(--pu)}
+.sb-item i{font-size:17px;flex-shrink:0}
+.sb-badge{background:var(--re);color:#fff;border-radius:8px;font-size:9px;padding:1px 6px;margin-right:auto}
+.sb-badge.green{background:var(--gr2);color:var(--gr)}
+.sb-footer{padding:12px 16px;border-top:.5px solid var(--b1);font-size:11px;color:var(--mu)}
+.api-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;margin-left:5px}
+.api-dot.on{background:var(--gr)}.api-dot.off{background:var(--re)}
+/* TOPBAR */
+.topbar{padding:14px 24px;border-bottom:.5px solid var(--b1);background:var(--bg2);display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:10}
+.topbar-title{font-size:17px;font-weight:700}
+.topbar-r{display:flex;align-items:center;gap:10px}
+/* PAGES */
+.page{display:none;padding:24px}.page.on{display:block}
+/* STAT BOXES */
+.stat-row{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.stat-box{background:var(--card);border:.5px solid var(--b1);border-radius:var(--r2);padding:16px}
+.stat-lbl{font-size:10px;color:var(--mu2);letter-spacing:.5px}
+.stat-val{font-size:26px;font-weight:700;margin:5px 0 2px;line-height:1}
+.stat-sub{font-size:11px;color:var(--mu)}
+.stat-trend{font-size:11px;margin-top:6px;display:flex;align-items:center;gap:4px}
+.up{color:var(--gr)}.dn{color:var(--re)}
+/* CARD */
+.card{background:var(--card);border:.5px solid var(--b1);border-radius:var(--r2);margin-bottom:18px;overflow:hidden}
+.card-hdr{padding:14px 18px;border-bottom:.5px solid var(--b1);display:flex;align-items:center;gap:10px}
+.card-ico{width:34px;height:34px;border-radius:9px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+.card-title{font-size:14px;font-weight:600}
+.card-sub{font-size:11px;color:var(--mu2);margin-top:2px}
+.card-body{padding:18px}
+.card-footer{padding:10px 18px;border-top:.5px solid var(--b1);background:rgba(0,0,0,.15);font-size:11px;color:var(--mu2)}
+/* TABLE */
+.tbl{width:100%;border-collapse:collapse}
+.tbl th{padding:9px 12px;text-align:right;font-size:10px;font-weight:700;color:var(--mu2);letter-spacing:.8px;text-transform:uppercase;border-bottom:.5px solid var(--b1);background:rgba(0,0,0,.15)}
+.tbl td{padding:11px 12px;border-bottom:.5px solid var(--b1);font-size:13px;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:rgba(255,255,255,.02)}
+.tbl .lft{text-align:left;direction:ltr}
+/* FORM */
+.field{display:flex;flex-direction:column;gap:6px;margin-bottom:14px}
+.field-label{font-size:11px;font-weight:600;color:var(--mu2);letter-spacing:.3px}
+.inp{width:100%;padding:10px 12px;border-radius:var(--r);border:.5px solid var(--b2);background:var(--bg3);color:var(--tx);font-size:13px;font-family:'Vazirmatn',sans-serif;outline:none;transition:border-color .13s}
+.inp:focus{border-color:rgba(167,139,250,.5)}
+.inp[type=number]{text-align:left;direction:ltr}
+select.inp{cursor:pointer}
+.inp-row{display:grid;gap:12px}
+.inp-row.cols2{grid-template-columns:1fr 1fr}
+.inp-row.cols3{grid-template-columns:1fr 1fr 1fr}
+textarea.inp{resize:vertical;min-height:80px}
+/* UPLOAD ZONE */
+.upload-zone{border:1.5px dashed var(--b2);border-radius:var(--r2);padding:24px;text-align:center;cursor:pointer;transition:all .15s;position:relative;background:var(--bg3)}
+.upload-zone:hover,.upload-zone.dov{border-color:var(--pu);background:rgba(124,58,237,.06)}
+.upload-zone i{font-size:36px;color:var(--mu);display:block;margin-bottom:8px}
+.upload-zone p{font-size:13px;color:var(--mu);line-height:1.6}
+.upload-zone b{color:var(--pu)}
+.upload-zone input{position:absolute;inset:0;opacity:0;cursor:pointer}
+.upload-preview{margin-top:12px;padding:10px 14px;background:rgba(52,211,153,.07);border:.5px solid rgba(52,211,153,.2);border-radius:var(--r);display:none;align-items:center;gap:10px}
+.upload-preview.show{display:flex}
+/* BUTTONS */
+.btn{padding:8px 16px;border-radius:var(--r);border:none;font-size:13px;cursor:pointer;font-family:'Vazirmatn',sans-serif;font-weight:500;transition:opacity .12s;display:inline-flex;align-items:center;gap:6px}
+.btn:active{opacity:.8}.btn:disabled{opacity:.4;cursor:not-allowed}
+.btn.primary{background:var(--pu2);color:#fff}
+.btn.success{background:var(--gr2);color:var(--gr)}
+.btn.danger{background:rgba(248,113,113,.15);color:var(--re);border:.5px solid rgba(248,113,113,.2)}
+.btn.subtle{background:var(--bg3);color:var(--mu2);border:.5px solid var(--b2)}
+.btn.warning{background:rgba(251,191,36,.13);color:var(--am)}
+.btn-row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+/* BADGE */
+.badge{font-size:10px;padding:2px 8px;border-radius:8px;font-weight:500;display:inline-flex;align-items:center;gap:4px}
+.badge.green{background:rgba(52,211,153,.13);color:var(--gr)}
+.badge.red{background:rgba(248,113,113,.13);color:var(--re)}
+.badge.amber{background:rgba(251,191,36,.13);color:var(--am)}
+.badge.purple{background:rgba(167,139,250,.13);color:var(--pu)}
+.badge.blue{background:rgba(96,165,250,.13);color:var(--bl)}
+/* TOGGLE */
+.stgl{position:relative;display:inline-block;width:40px;height:22px}
+.stgl input{opacity:0;width:0;height:0;position:absolute}
+.stgl-s{position:absolute;inset:0;background:var(--bg3);border-radius:11px;cursor:pointer;transition:background .2s;border:.5px solid var(--b2)}
+.stgl-s:before{content:'';position:absolute;height:16px;width:16px;left:2px;bottom:2px;background:var(--mu);border-radius:50%;transition:all .2s}
+.stgl input:checked+.stgl-s{background:var(--pu2);border-color:var(--pu2)}
+.stgl input:checked+.stgl-s:before{transform:translateX(18px);background:#fff}
+/* RANGE */
+.range-wrap{display:flex;align-items:center;gap:12px}
+.range{flex:1;-webkit-appearance:none;height:4px;border-radius:2px;background:var(--bg3);outline:none;cursor:pointer}
+.range::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:var(--pu2);cursor:pointer;border:2px solid var(--bg)}
+.range-val{min-width:48px;text-align:left;font-size:13px;font-weight:600;color:var(--pu)}
+/* INFO BOXES */
+.info-box{background:rgba(96,165,250,.07);border:.5px solid rgba(96,165,250,.2);border-radius:var(--r);padding:12px 14px;font-size:12px;color:var(--bl);line-height:1.7;margin-bottom:14px}
+.warn-box{background:rgba(251,191,36,.07);border:.5px solid rgba(251,191,36,.2);border-radius:var(--r);padding:12px 14px;font-size:12px;color:var(--am);line-height:1.7;margin-bottom:14px}
+.err-box{background:rgba(248,113,113,.07);border:.5px solid rgba(248,113,113,.2);border-radius:var(--r);padding:12px 14px;font-size:12px;color:var(--re);line-height:1.7;margin-bottom:14px;display:none}
+.err-box.show{display:block}
+/* PROGRESS */
+.progress-bar{height:6px;background:var(--bg3);border-radius:3px;overflow:hidden;margin-top:8px}
+.progress-fill{height:100%;background:var(--pu);border-radius:3px;transition:width .3s}
+/* DIVIDER */
+.divider{height:.5px;background:var(--b1);margin:16px 0}
+/* MODAL */
+.modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.8);z-index:50;display:flex;align-items:center;justify-content:center;opacity:0;pointer-events:none;transition:opacity .2s}
+.modal-ov.on{opacity:1;pointer-events:all}
+.modal{background:var(--bg2);border-radius:var(--r2);border:.5px solid var(--b2);padding:24px;max-width:520px;width:calc(100% - 40px);max-height:90vh;overflow-y:auto}
+.modal-title{font-size:16px;font-weight:600;margin-bottom:16px;display:flex;align-items:center;justify-content:space-between}
+.modal-close{background:none;border:none;cursor:pointer;color:var(--mu);font-size:20px;padding:2px}
+/* TOAST */
+.toast-wrap{position:fixed;top:16px;left:50%;transform:translateX(-50%);z-index:200;pointer-events:none;display:flex;flex-direction:column;gap:8px;align-items:center}
+.toast{background:var(--card2);border:.5px solid rgba(167,139,250,.3);border-radius:20px;padding:8px 20px;font-size:12px;color:var(--pu);animation:tIn .2s ease,tOut .2s ease 2.5s forwards;white-space:nowrap}
+.toast.success{border-color:rgba(52,211,153,.3);color:var(--gr)}
+.toast.error{border-color:rgba(248,113,113,.3);color:var(--re)}
+.toast.warn{border-color:rgba(251,191,36,.3);color:var(--am)}
+@keyframes tIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+@keyframes tOut{to{opacity:0}}
+/* SPIN */
+.spin{display:inline-block;width:14px;height:14px;border:2px solid rgba(255,255,255,.2);border-top-color:currentColor;border-radius:50%;animation:sp .7s linear infinite;vertical-align:middle}
+@keyframes sp{to{transform:rotate(360deg)}}
+/* RESPONSIVE */
+@media(max-width:768px){.sidebar{display:none}.stat-row{grid-template-columns:1fr 1fr}.inp-row.cols3{grid-template-columns:1fr 1fr}.inp-row.cols2{grid-template-columns:1fr}}
+/* AUDIO PLAYER PREVIEW */
+.audio-preview{background:var(--bg3);border:.5px solid var(--b2);border-radius:var(--r);padding:10px 14px;display:flex;align-items:center;gap:10px;margin-top:8px}
+.audio-preview audio{flex:1;height:32px}
+/* NOTIF ITEM */
+.notif-sent{display:flex;align-items:flex-start;gap:10px;padding:12px 14px;border-bottom:.5px solid var(--b1)}
+.notif-sent:last-child{border-bottom:none}
+.notif-ico{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:16px}
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- ══ SIDEBAR ══ -->
+<div class="sidebar">
+  <div class="sb-logo">
+    <div><div class="sb-logo-txt">vi<em>be</em></div></div>
+    <div class="sb-admin">ADMIN</div>
+  </div>
+  <div class="sb-nav">
+    <div class="sb-sec">داشبورد</div>
+    <div class="sb-item on" onclick="showPage('dashboard',this)"><i class="ti ti-layout-dashboard"></i>خلاصه</div>
+
+    <div class="sb-sec">محتوا</div>
+    <div class="sb-item" onclick="showPage('upload-music',this)"><i class="ti ti-music-plus"></i>آپلود موزیک</div>
+    <div class="sb-item" onclick="showPage('upload-video',this)"><i class="ti ti-video-plus"></i>آپلود ویدیو</div>
+    <div class="sb-item" onclick="showPage('tracks',this)"><i class="ti ti-music"></i>مدیریت ترک‌ها<div class="sb-badge green" id="sb-tracks-count">0</div></div>
+
+    <div class="sb-sec">کاربران</div>
+    <div class="sb-item" onclick="showPage('artists',this)"><i class="ti ti-microphone-2"></i>آرتیست‌ها</div>
+    <div class="sb-item" onclick="showPage('users',this)"><i class="ti ti-users"></i>کاربران</div>
+
+    <div class="sb-sec">اطلاع‌رسانی</div>
+    <div class="sb-item" onclick="showPage('notifications',this)"><i class="ti ti-bell-ringing"></i>ارسال نوتیف</div>
+
+    <div class="sb-sec">اقتصاد</div>
+    <div class="sb-item" onclick="showPage('coins',this)"><i class="ti ti-coin"></i>تنظیم Coin‌ها</div>
+    <div class="sb-item" onclick="showPage('withdrawals',this)"><i class="ti ti-cash"></i>برداشت‌ها<div class="sb-badge" id="sb-wd-count">0</div></div>
+    <div class="sb-item" onclick="showPage('revenue',this)"><i class="ti ti-chart-pie"></i>تقسیم درآمد</div>
+
+    <div class="sb-sec">سیستم</div>
+    <div class="sb-item" onclick="showPage('anticheat',this)"><i class="ti ti-shield-check"></i>Anti-Fraud</div>
+    <div class="sb-item" onclick="showPage('export',this)"><i class="ti ti-download"></i>خروجی JSON</div>
+  </div>
+  <div class="sb-footer">
+    <div style="display:flex;align-items:center;gap:6px">
+      <div class="api-dot off" id="api-dot"></div>
+      <span id="api-status">در حال اتصال...</span>
+    </div>
+    <div style="margin-top:4px;color:var(--mu)">آخرین ذخیره: <span id="last-save">—</span></div>
+  </div>
+</div>
+
+<!-- ══ MAIN ══ -->
+<div class="main">
+  <div class="topbar">
+    <div class="topbar-title" id="topbar-title">داشبورد</div>
+    <div class="topbar-r">
+      <div id="unsaved-dot" style="width:7px;height:7px;background:var(--am);border-radius:50%;display:none"></div>
+      <button class="btn subtle" id="discard-btn" onclick="discardChanges()" style="display:none">لغو</button>
+      <button class="btn primary" id="save-btn" onclick="saveAll()"><i class="ti ti-device-floppy" style="font-size:15px"></i>ذخیره</button>
+    </div>
+  </div>
+
+  <!-- ══════ DASHBOARD ══════ -->
+  <div class="page on" id="pg-dashboard">
+    <div class="stat-row">
+      <div class="stat-box"><div class="stat-lbl">کل ترک‌ها</div><div class="stat-val" style="color:var(--pu)" id="dash-tracks">—</div><div class="stat-sub">در سیستم</div></div>
+      <div class="stat-box"><div class="stat-lbl">کل کاربران</div><div class="stat-val" style="color:var(--gr)" id="dash-users">—</div><div class="stat-sub">ثبت‌نام شده</div></div>
+      <div class="stat-box"><div class="stat-lbl">برداشت pending</div><div class="stat-val" style="color:var(--re)" id="dash-wd">0</div><div class="stat-sub">منتظر تأیید</div></div>
+      <div class="stat-box"><div class="stat-lbl">وضعیت API</div><div class="stat-val" style="font-size:20px" id="dash-api">⏳</div><div class="stat-sub" id="dash-api-url">بررسی میشه...</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr"><div class="card-ico" style="background:rgba(167,139,250,.13)"><i class="ti ti-activity" style="color:var(--pu)"></i></div><div><div class="card-title">راهنمای سریع</div><div class="card-sub">اول چیکار کنم؟</div></div></div>
+      <div class="card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div style="background:var(--bg3);border:.5px solid var(--b1);border-radius:var(--r);padding:14px;cursor:pointer" onclick="showPage('upload-music',document.querySelector('[onclick*=upload-music]'))">
+            <div style="font-size:24px;margin-bottom:8px">🎵</div>
+            <div style="font-size:13px;font-weight:500">آپلود موزیک</div>
+            <div style="font-size:11px;color:var(--mu);margin-top:4px">ترک جدید اضافه کن</div>
+          </div>
+          <div style="background:var(--bg3);border:.5px solid var(--b1);border-radius:var(--r);padding:14px;cursor:pointer" onclick="showPage('notifications',document.querySelector('[onclick*=notifications]'))">
+            <div style="font-size:24px;margin-bottom:8px">🔔</div>
+            <div style="font-size:13px;font-weight:500">ارسال نوتیف</div>
+            <div style="font-size:11px;color:var(--mu);margin-top:4px">به همه کاربران خبر بده</div>
+          </div>
+          <div style="background:var(--bg3);border:.5px solid var(--b1);border-radius:var(--r);padding:14px;cursor:pointer" onclick="showPage('withdrawals',document.querySelector('[onclick*=withdrawals]'))">
+            <div style="font-size:24px;margin-bottom:8px">💸</div>
+            <div style="font-size:13px;font-weight:500">برداشت‌ها</div>
+            <div style="font-size:11px;color:var(--mu);margin-top:4px">تأیید یا رد کن</div>
+          </div>
+          <div style="background:var(--bg3);border:.5px solid var(--b1);border-radius:var(--r);padding:14px;cursor:pointer" onclick="showPage('coins',document.querySelector('[onclick*=coins]'))">
+            <div style="font-size:24px;margin-bottom:8px">🪙</div>
+            <div style="font-size:13px;font-weight:500">تنظیم Coin</div>
+            <div style="font-size:11px;color:var(--mu);margin-top:4px">مقدار Reward رو تنظیم کن</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="info-box"><i class="ti ti-info-circle"></i> برای اتصال کامل، backend رو با دستور <code style="background:var(--bg3);padding:1px 6px;border-radius:4px;font-size:11px">uvicorn app.main:app --reload --port 8000</code> اجرا کن. بعد refresh کن.</div>
+      </div>
+    </div>
+    <!-- Recent tracks -->
+    <div class="card">
+      <div class="card-hdr"><div class="card-ico" style="background:rgba(52,211,153,.12)"><i class="ti ti-music" style="color:var(--gr)"></i></div><div><div class="card-title">ترک‌های اخیر</div></div></div>
+      <div id="dash-recent-tracks"><div style="padding:20px;text-align:center;color:var(--mu);font-size:13px">در حال بارگذاری...</div></div>
+    </div>
+  </div>
+
+  <!-- ══════ UPLOAD MUSIC ══════ -->
+  <div class="page" id="pg-upload-music">
+    <div class="card">
+      <div class="card-hdr"><div class="card-ico" style="background:rgba(167,139,250,.13)"><i class="ti ti-music-plus" style="color:var(--pu)"></i></div><div><div class="card-title">آپلود ترک جدید</div><div class="card-sub">فایل صوتی + متادیتا</div></div></div>
+      <div class="card-body">
+        <div class="err-box" id="upload-err"></div>
+        <!-- Audio file -->
+        <div class="field">
+          <div class="field-label">فایل صوتی *</div>
+          <div class="upload-zone" id="audio-dz" onclick="document.getElementById('audio-inp').click()">
+            <i class="ti ti-file-music"></i>
+            <p>فایل صوتی بکش اینجا یا کلیک کن<br><b>MP3, WAV, FLAC, OGG, M4A — حداکثر ۵۰MB</b></p>
+            <input type="file" id="audio-inp" accept="audio/*" onchange="handleAudioSelect(this)">
+          </div>
+          <div class="upload-preview" id="audio-preview">
+            <i class="ti ti-check" style="color:var(--gr);font-size:18px"></i>
+            <div style="flex:1">
+              <div id="audio-filename" style="font-size:13px;font-weight:500"></div>
+              <div id="audio-filesize" style="font-size:11px;color:var(--mu)"></div>
+            </div>
+            <button class="btn danger" onclick="clearAudio()" style="padding:5px 10px;font-size:11px">حذف</button>
+          </div>
+        </div>
+        <!-- Cover image -->
+        <div class="field">
+          <div class="field-label">کاور (اختیاری)</div>
+          <div class="upload-zone" id="cover-dz" onclick="document.getElementById('cover-inp').click()" style="padding:16px">
+            <i class="ti ti-photo" style="font-size:28px"></i>
+            <p style="font-size:12px">JPG, PNG, WebP — حداکثر ۵MB</p>
+            <input type="file" id="cover-inp" accept="image/*" onchange="handleCoverSelect(this)">
+          </div>
+          <div class="upload-preview" id="cover-preview">
+            <img id="cover-img" style="width:40px;height:40px;border-radius:8px;object-fit:cover">
+            <div style="flex:1"><div id="cover-filename" style="font-size:13px;font-weight:500"></div></div>
+            <button class="btn danger" onclick="clearCover()" style="padding:5px 10px;font-size:11px">حذف</button>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <!-- Metadata -->
+        <div class="inp-row cols2">
+          <div class="field"><div class="field-label">عنوان ترک *</div><input class="inp" id="um-title" type="text" placeholder="مثلاً: نه بدون تو"></div>
+          <div class="field"><div class="field-label">نام آرتیست *</div><input class="inp" id="um-artist" type="text" placeholder="مثلاً: Hichkas"></div>
+        </div>
+        <div class="inp-row cols3">
+          <div class="field"><div class="field-label">ژانر</div>
+            <select class="inp" id="um-genre">
+              <option value="Rap">Rap</option><option value="Trap">Trap</option><option value="R&B">R&B</option>
+              <option value="Pop">Pop</option><option value="Lo-Fi">Lo-Fi</option><option value="Electronic">Electronic</option><option value="Other">سایر</option>
+            </select>
+          </div>
+          <div class="field"><div class="field-label">حالت</div>
+            <select class="inp" id="um-mood">
+              <option value="hot">😤 گرم</option><option value="chill">😌 آروم</option>
+              <option value="energy">⚡ انرژی</option><option value="night">🌙 شب</option>
+            </select>
+          </div>
+          <div class="field"><div class="field-label">نوع ترک</div>
+            <select class="inp" id="um-type">
+              <option value="normal">عادی</option>
+              <option value="sponsored">💼 Sponsored</option>
+              <option value="early">✨ Early</option>
+            </select>
+          </div>
+        </div>
+        <div class="inp-row cols2">
+          <div class="field"><div class="field-label">Coin Reward</div><input class="inp" type="number" id="um-reward" value="10" min="1" max="200"></div>
+          <div class="field"><div class="field-label">Coin ویدیو (اگه MV هست)</div><input class="inp" type="number" id="um-video-reward" value="0" min="0" max="500"></div>
+        </div>
+        <div class="field"><div class="field-label">متن ترک (اختیاری)</div><textarea class="inp" id="um-lyrics" placeholder="متن آهنگ..."></textarea></div>
+        <!-- Links -->
+        <div class="divider"></div>
+        <div style="font-size:12px;font-weight:600;color:var(--mu2);margin-bottom:10px">لینک‌های پلتفرم (اختیاری)</div>
+        <div class="inp-row cols2">
+          <div class="field"><div class="field-label">Spotify</div><input class="inp" id="um-spotify" type="url" placeholder="https://open.spotify.com/..." dir="ltr"></div>
+          <div class="field"><div class="field-label">Instagram</div><input class="inp" id="um-instagram" type="url" placeholder="https://instagram.com/..." dir="ltr"></div>
+          <div class="field"><div class="field-label">YouTube</div><input class="inp" id="um-youtube" type="url" placeholder="https://youtube.com/..." dir="ltr"></div>
+          <div class="field"><div class="field-label">SoundCloud</div><input class="inp" id="um-soundcloud" type="url" placeholder="https://soundcloud.com/..." dir="ltr"></div>
+        </div>
+        <!-- Upload progress -->
+        <div id="upload-progress" style="display:none">
+          <div style="font-size:12px;color:var(--mu2);margin-bottom:6px" id="upload-status-text">در حال آپلود...</div>
+          <div class="progress-bar"><div class="progress-fill" id="upload-progress-fill" style="width:0%"></div></div>
+        </div>
+        <div class="btn-row" style="margin-top:16px">
+          <button class="btn primary" id="upload-btn" onclick="uploadTrack()"><i class="ti ti-upload"></i>آپلود ترک</button>
+          <button class="btn subtle" onclick="clearUploadForm()"><i class="ti ti-x"></i>پاک کردن</button>
+        </div>
+      </div>
+    </div>
+    <!-- Recent uploads -->
+    <div class="card">
+      <div class="card-hdr"><div class="card-ico" style="background:rgba(52,211,153,.12)"><i class="ti ti-clock" style="color:var(--gr)"></i></div><div><div class="card-title">آپلودهای اخیر</div></div></div>
+      <div id="recent-uploads"><div style="padding:20px;text-align:center;color:var(--mu);font-size:13px">بارگذاری...</div></div>
+    </div>
+  </div>
+
+  <!-- ══════ UPLOAD VIDEO ══════ -->
+  <div class="page" id="pg-upload-video">
+    <div class="card">
+      <div class="card-hdr"><div class="card-ico" style="background:rgba(248,113,113,.12)"><i class="ti ti-video-plus" style="color:var(--re)"></i></div><div><div class="card-title">اضافه کردن موزیک ویدیو</div><div class="card-sub">ویدیو رو به یه ترک موجود وصل کن</div></div></div>
+      <div class="card-body">
+        <div class="info-box"><i class="ti ti-info-circle"></i> ویدیو باید به یه ترک موجود وصل بشه. اگه ترک هنوز ندارید، اول از بخش "آپلود موزیک" ترک بساز.</div>
+        <div class="field"><div class="field-label">ترک مرتبط *</div>
+          <select class="inp" id="uv-track">
+            <option value="">انتخاب ترک...</option>
+          </select>
+        </div>
+        <div class="divider"></div>
+        <div style="font-size:12px;font-weight:600;color:var(--mu2);margin-bottom:10px">منبع ویدیو — یکی رو انتخاب کن:</div>
+        <!-- Tab: File or URL -->
+        <div style="display:flex;gap:0;border-radius:var(--r);overflow:hidden;border:.5px solid var(--b2);margin-bottom:16px">
+          <button id="vt-file" onclick="switchVideoTab('file')" style="flex:1;padding:8px;background:var(--pu2);color:#fff;border:none;cursor:pointer;font-family:'Vazirmatn',sans-serif;font-size:12px;font-weight:500">آپلود فایل</button>
+          <button id="vt-url" onclick="switchVideoTab('url')" style="flex:1;padding:8px;background:var(--bg3);color:var(--mu);border:none;cursor:pointer;font-family:'Vazirmatn',sans-serif;font-size:12px;font-weight:500">لینک YouTube/URL</button>
+        </div>
+        <div id="video-tab-file">
+          <div class="field">
+            <div class="upload-zone" onclick="document.getElementById('video-inp').click()">
+              <i class="ti ti-video"></i><p>فایل ویدیو بکش اینجا<br><b>MP4, MOV, AVI — حداکثر ۵۰۰MB</b></p>
+              <input type="file" id="video-inp" accept="video/*" onchange="handleVideoSelect(this)">
+            </div>
+            <div class="upload-preview" id="video-preview">
+              <i class="ti ti-check" style="color:var(--gr);font-size:18px"></i>
+              <div style="flex:1"><div id="video-filename" style="font-size:13px;font-weight:500"></div><div id="video-filesize" style="font-size:11px;color:var(--mu)"></div></div>
+              <button class="btn danger" onclick="clearVideo()" style="padding:5px 10px;font-size:11px">حذف</button>
+            </div>
+          </div>
+        </div>
+        <div id="video-tab-url" style="display:none">
+          <div class="field">
+            <div class="field-label">لینک YouTube یا URL مستقیم</div>
+            <input class="inp" id="uv-url" type="url" placeholder="https://youtube.com/watch?v=... یا https://..." dir="ltr">
+          </div>
+        </div>
+        <div class="field"><div class="field-label">Coin Reward برای تماشا</div><input class="inp" type="number" id="uv-reward" value="20" min="1" max="500"></div>
+        <button class="btn primary" onclick="uploadVideo()"><i class="ti ti-upload"></i>ذخیره ویدیو</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ TRACKS MANAGEMENT ══════ -->
+  <div class="page" id="pg-tracks">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div>
+        <div style="font-size:18px;font-weight:700">مدیریت ترک‌ها</div>
+        <div style="font-size:12px;color:var(--mu);margin-top:3px">همه ترک‌های موجود در سیستم</div>
+      </div>
+      <div class="btn-row">
+        <input class="inp" id="track-search" style="width:200px" placeholder="جستجو..." oninput="filterTracks(this.value)">
+        <button class="btn primary" onclick="showPage('upload-music',document.querySelector('[onclick*=upload-music]'))"><i class="ti ti-plus"></i>ترک جدید</button>
+      </div>
+    </div>
+    <div class="card">
+      <div id="tracks-table"><div style="padding:40px;text-align:center;color:var(--mu);font-size:13px"><div class="spin" style="font-size:20px;width:24px;height:24px;border-width:3px"></div><br><br>در حال بارگذاری...</div></div>
+    </div>
+  </div>
+
+  <!-- ══════ ARTISTS ══════ -->
+  <div class="page" id="pg-artists">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">
+      <div style="font-size:18px;font-weight:700">مدیریت آرتیست‌ها</div>
+      <button class="btn primary" onclick="openAddArtistModal()"><i class="ti ti-plus"></i>آرتیست جدید</button>
+    </div>
+    <div class="card">
+      <div id="artists-table"><div style="padding:40px;text-align:center;color:var(--mu);font-size:13px">بارگذاری...</div></div>
+    </div>
+  </div>
+
+  <!-- ══════ USERS ══════ -->
+  <div class="page" id="pg-users">
+    <div style="font-size:18px;font-weight:700;margin-bottom:16px">مدیریت کاربران</div>
+    <div class="card">
+      <div id="users-table"><div style="padding:40px;text-align:center;color:var(--mu);font-size:13px">بارگذاری...</div></div>
+    </div>
+  </div>
+
+  <!-- ══════ NOTIFICATIONS ══════ -->
+  <div class="page" id="pg-notifications">
+    <div class="card">
+      <div class="card-hdr"><div class="card-ico" style="background:rgba(251,191,36,.12)"><i class="ti ti-bell-ringing" style="color:var(--am)"></i></div><div><div class="card-title">ارسال نوتیفیکیشن</div><div class="card-sub">به همه کاربران یا گروه خاص</div></div></div>
+      <div class="card-body">
+        <div class="inp-row cols2">
+          <div class="field"><div class="field-label">مخاطب</div>
+            <select class="inp" id="notif-target">
+              <option value="all">همه کاربران</option>
+              <option value="artists">فقط آرتیست‌ها</option>
+              <option value="active">کاربران فعال (۷ روز اخیر)</option>
+            </select>
+          </div>
+          <div class="field"><div class="field-label">نوع</div>
+            <select class="inp" id="notif-type">
+              <option value="system">⚙️ سیستم</option>
+              <option value="coin">🪙 Coin</option>
+              <option value="mission">🎯 ماموریت</option>
+              <option value="artist">🎵 آرتیست</option>
+              <option value="new_track">🎵 ترک جدید</option>
+            </select>
+          </div>
+        </div>
+        <div class="field"><div class="field-label">عنوان *</div><input class="inp" id="notif-title" type="text" placeholder="مثلاً: ترک جدید منتشر شد!"></div>
+        <div class="field"><div class="field-label">متن *</div><textarea class="inp" id="notif-body" placeholder="متن نوتیف..." style="min-height:80px"></textarea></div>
+        <div class="field"><div class="field-label">لینک action (اختیاری)</div>
+          <select class="inp" id="notif-action">
+            <option value="">بدون لینک</option>
+            <option value="feed">رفتن به فید موزیک</option>
+            <option value="video">رفتن به ویدیو</option>
+            <option value="missions">رفتن به ماموریت‌ها</option>
+            <option value="wallet">رفتن به کیف پول</option>
+          </select>
+        </div>
+        <div class="btn-row">
+          <button class="btn primary" onclick="sendNotification()"><i class="ti ti-send"></i>ارسال نوتیف</button>
+          <button class="btn subtle" onclick="previewNotif()"><i class="ti ti-eye"></i>پیش‌نمایش</button>
+        </div>
+        <!-- Preview -->
+        <div id="notif-preview-box" style="display:none;margin-top:14px;background:var(--bg3);border:.5px solid var(--b2);border-radius:var(--r);padding:14px">
+          <div style="font-size:11px;color:var(--mu);margin-bottom:8px">پیش‌نمایش:</div>
+          <div style="display:flex;gap:10px;align-items:flex-start">
+            <div id="notif-prev-ico" style="width:36px;height:36px;border-radius:50%;background:rgba(144,144,184,.1);display:flex;align-items:center;justify-content:center;font-size:18px;flex-shrink:0">⚙️</div>
+            <div><div id="notif-prev-title" style="font-size:13px;font-weight:500">—</div><div id="notif-prev-body" style="font-size:11px;color:var(--mu);margin-top:3px">—</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Sent notifications history -->
+    <div class="card">
+      <div class="card-hdr"><div class="card-ico" style="background:rgba(96,165,250,.12)"><i class="ti ti-history" style="color:var(--bl)"></i></div><div><div class="card-title">نوتیف‌های ارسال شده</div></div>
+        <button class="btn subtle" onclick="clearNotifHistory()" style="margin-right:auto;padding:5px 12px;font-size:11px"><i class="ti ti-trash"></i>پاک کردن</button>
+      </div>
+      <div id="notif-history"><div style="padding:20px;text-align:center;color:var(--mu);font-size:13px">هنوز نوتیفی ارسال نشده</div></div>
+    </div>
+  </div>
+
+  <!-- ══════ COINS ══════ -->
+  <div class="page" id="pg-coins">
+    <div class="card">
+      <div class="card-hdr"><div class="card-ico" style="background:rgba(251,191,36,.12)"><i class="ti ti-coin" style="color:var(--am)"></i></div><div><div class="card-title">تنظیم مقادیر Coin</div><div class="card-sub">هر action چقدر Coin بده</div></div></div>
+      <div class="card-body">
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead><tr><th>اکشن</th><th>آیکون</th><th>Coin</th><th>XP</th><th>فعال</th></tr></thead>
+            <tbody>
+              <tr><td>گوش دادن (عادی)</td><td>🎵</td><td><input class="inp lft" type="number" id="c-listen" style="width:80px" min="0" max="500" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="c-listen-xp" style="width:70px" min="0" max="200" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="c-listen-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+              <tr><td>گوش دادن (Sponsored)</td><td>💼</td><td><input class="inp lft" type="number" id="c-sponsored" style="width:80px" min="0" max="500" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="c-sponsored-xp" style="width:70px" min="0" max="200" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="c-sponsored-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+              <tr><td>تماشای ویدیو</td><td>🎬</td><td><input class="inp lft" type="number" id="c-video" style="width:80px" min="0" max="500" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="c-video-xp" style="width:70px" min="0" max="200" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="c-video-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+              <tr><td>لایک</td><td>❤️</td><td><input class="inp lft" type="number" id="c-like" style="width:80px" min="0" max="100" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="c-like-xp" style="width:70px" min="0" max="100" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="c-like-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+              <tr><td>ذخیره ترک</td><td>🔖</td><td><input class="inp lft" type="number" id="c-save" style="width:80px" min="0" max="100" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="c-save-xp" style="width:70px" min="0" max="100" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="c-save-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+              <tr><td>Share</td><td>📤</td><td><input class="inp lft" type="number" id="c-share" style="width:80px" min="0" max="200" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="c-share-xp" style="width:70px" min="0" max="100" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="c-share-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+              <tr><td>فالو آرتیست</td><td>👤</td><td><input class="inp lft" type="number" id="c-follow" style="width:80px" min="0" max="200" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="c-follow-xp" style="width:70px" min="0" max="100" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="c-follow-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+              <tr><td>دانلود آفلاین</td><td>⬇️</td><td><input class="inp lft" type="number" id="c-download" style="width:80px" min="0" max="100" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="c-download-xp" style="width:70px" min="0" max="100" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="c-download-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+              <tr><td>دعوت دوست</td><td>🔗</td><td><input class="inp lft" type="number" id="c-referral" style="width:80px" min="0" max="1000" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="c-referral-xp" style="width:70px" min="0" max="500" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="c-referral-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+              <tr><td>Early Discover Bonus</td><td>🌟</td><td><input class="inp lft" type="number" id="c-early" style="width:80px" min="0" max="500" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="c-early-xp" style="width:70px" min="0" max="200" onchange="markDirty()"></td><td>یک‌بار</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="divider"></div>
+        <div class="inp-row cols3">
+          <div class="field"><div class="field-label">حداقل % برای Reward</div>
+            <div class="range-wrap">
+              <input class="range" type="range" id="c-min-pct" min="50" max="100" step="5" oninput="updRange('c-min-pct','c-min-pct-v','%');markDirty()">
+              <span class="range-val" id="c-min-pct-v">85%</span>
+            </div>
+          </div>
+          <div class="field"><div class="field-label">حداکثر Reward / ترک / روز</div>
+            <div class="range-wrap">
+              <input class="range" type="range" id="c-daily-limit" min="1" max="10" step="1" oninput="updRange('c-daily-limit','c-daily-limit-v','× در روز');markDirty()">
+              <span class="range-val" id="c-daily-limit-v">3×</span>
+            </div>
+          </div>
+          <div class="field"><div class="field-label">نرخ تبدیل (تومان/Coin)</div>
+            <input class="inp lft" type="number" id="c-toman-rate" value="15" min="1" max="10000" onchange="markDirty()">
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- Missions -->
+    <div class="card">
+      <div class="card-hdr"><div class="card-ico" style="background:rgba(124,58,237,.12)"><i class="ti ti-target" style="color:var(--pu)"></i></div><div><div class="card-title">ماموریت‌های روزانه</div></div></div>
+      <div class="card-body">
+        <div style="overflow-x:auto">
+          <table class="tbl">
+            <thead><tr><th>ماموریت</th><th>هدف</th><th>Coin Reward</th><th>XP</th><th>فعال</th></tr></thead>
+            <tbody>
+              <tr><td>گوش دادن روزانه</td><td><input class="inp lft" type="number" id="m-listen-t" style="width:70px" min="1" max="20" onchange="markDirty()"> ترک</td><td><input class="inp lft" type="number" id="m-listen-c" style="width:80px" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="m-listen-xp" style="width:70px" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="m-listen-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+              <tr><td>لایک روزانه</td><td><input class="inp lft" type="number" id="m-like-t" style="width:70px" min="1" max="20" onchange="markDirty()"> ترک</td><td><input class="inp lft" type="number" id="m-like-c" style="width:80px" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="m-like-xp" style="width:70px" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="m-like-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+              <tr><td>Share روزانه</td><td><input class="inp lft" type="number" id="m-share-t" style="width:70px" min="1" max="10" onchange="markDirty()"> بار</td><td><input class="inp lft" type="number" id="m-share-c" style="width:80px" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="m-share-xp" style="width:70px" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="m-share-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+              <tr><td>ماموریت هفتگی (ساعت)</td><td><input class="inp lft" type="number" id="m-weekly-t" style="width:70px" min="1" max="50" onchange="markDirty()"> ساعت</td><td><input class="inp lft" type="number" id="m-weekly-c" style="width:80px" onchange="markDirty()"></td><td><input class="inp lft" type="number" id="m-weekly-xp" style="width:70px" onchange="markDirty()"></td><td><label class="stgl"><input type="checkbox" id="m-weekly-on" checked onchange="markDirty()"><span class="stgl-s"></span></label></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ WITHDRAWALS ══════ -->
+  <div class="page" id="pg-withdrawals">
+    <div style="font-size:18px;font-weight:700;margin-bottom:16px">مدیریت برداشت‌ها</div>
+    <div class="stat-row" style="grid-template-columns:repeat(3,1fr)">
+      <div class="stat-box"><div class="stat-lbl">Pending</div><div class="stat-val" style="color:var(--am)" id="wd-pending-count">0</div><div class="stat-sub">منتظر تأیید</div></div>
+      <div class="stat-box"><div class="stat-lbl">پرداخت شده امروز</div><div class="stat-val" style="color:var(--gr)" id="wd-paid-today">0</div><div class="stat-sub">تومان</div></div>
+      <div class="stat-box"><div class="stat-lbl">کل پرداخت شده</div><div class="stat-val" style="color:var(--pu)" id="wd-total-paid">0</div><div class="stat-sub">تومان</div></div>
+    </div>
+    <div class="card">
+      <div class="card-hdr">
+        <div class="card-ico" style="background:rgba(248,113,113,.12)"><i class="ti ti-cash" style="color:var(--re)"></i></div>
+        <div><div class="card-title">درخواست‌های برداشت</div></div>
+        <div style="margin-right:auto;display:flex;gap:8px">
+          <select class="inp" id="wd-filter" style="width:130px;padding:6px 10px" onchange="loadWithdrawals()">
+            <option value="pending">Pending</option>
+            <option value="approved">تأیید شده</option>
+            <option value="paid">پرداخت شده</option>
+            <option value="rejected">رد شده</option>
+          </select>
+          <button class="btn subtle" onclick="loadWithdrawals()"><i class="ti ti-refresh"></i></button>
+        </div>
+      </div>
+      <div id="wd-table"><div style="padding:40px;text-align:center;color:var(--mu);font-size:13px">بارگذاری...</div></div>
+    </div>
+  </div>
+
+  <!-- ══════ REVENUE ══════ -->
+  <div class="page" id="pg-revenue">
+    <div class="card">
+      <div class="card-hdr"><div class="card-ico" style="background:rgba(52,211,153,.12)"><i class="ti ti-chart-pie" style="color:var(--gr)"></i></div><div><div class="card-title">تقسیم درآمد</div><div class="card-sub">از هر کمپین Sponsored — مجموع باید ۱۰۰٪ بشه</div></div></div>
+      <div class="card-body">
+        <div class="inp-row cols2">
+          <div class="field">
+            <div class="field-label" style="color:var(--gr)">سهم آرتیست</div>
+            <div class="range-wrap"><input class="range" type="range" id="rev-artist" min="0" max="100" step="5" oninput="syncRev('artist');markDirty()"><span class="range-val" id="rev-artist-v" style="color:var(--gr)">70%</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label" style="color:var(--pu)">سهم Vibe (پلتفرم)</div>
+            <div class="range-wrap"><input class="range" type="range" id="rev-platform" min="0" max="100" step="5" oninput="syncRev('platform');markDirty()"><span class="range-val" id="rev-platform-v" style="color:var(--pu)">20%</span></div>
+          </div>
+          <div class="field">
+            <div class="field-label" style="color:var(--am)">سهم شنونده</div>
+            <div class="range-wrap"><input class="range" type="range" id="rev-listener" min="0" max="100" step="5" oninput="syncRev('listener');markDirty()"><span class="range-val" id="rev-listener-v" style="color:var(--am)">10%</span></div>
+          </div>
+          <div class="field" style="align-self:center">
+            <div id="rev-check" style="background:var(--bg3);border:.5px solid var(--b2);border-radius:var(--r);padding:14px;font-size:13px;line-height:2"></div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="inp-row cols3">
+          <div class="field"><div class="field-label">کارمزد برداشت کاربر</div><div class="range-wrap"><input class="range" type="range" id="fee-wd" min="0" max="20" step="1" oninput="updRange('fee-wd','fee-wd-v','%');markDirty()"><span class="range-val" id="fee-wd-v">5%</span></div></div>
+          <div class="field"><div class="field-label">کارمزد برداشت آرتیست</div><div class="range-wrap"><input class="range" type="range" id="fee-art" min="0" max="20" step="1" oninput="updRange('fee-art','fee-art-v','%');markDirty()"><span class="range-val" id="fee-art-v">3%</span></div></div>
+          <div class="field"><div class="field-label">کارمزد کمپین</div><div class="range-wrap"><input class="range" type="range" id="fee-camp" min="0" max="30" step="1" oninput="updRange('fee-camp','fee-camp-v','%');markDirty()"><span class="range-val" id="fee-camp-v">10%</span></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ ANTI-FRAUD ══════ -->
+  <div class="page" id="pg-anticheat">
+    <div class="card">
+      <div class="card-hdr"><div class="card-ico" style="background:rgba(52,211,153,.12)"><i class="ti ti-shield-check" style="color:var(--gr)"></i></div><div><div class="card-title">تنظیمات Anti-Fraud</div></div></div>
+      <div class="card-body">
+        <div class="inp-row cols3">
+          <div class="field"><div class="field-label">حداکثر session از یه device/ساعت</div><input class="inp lft" type="number" id="af-device" value="50" min="5" max="500" onchange="markDirty()"></div>
+          <div class="field"><div class="field-label">حداکثر session از یه IP/ساعت</div><input class="inp lft" type="number" id="af-ip" value="200" min="5" max="1000" onchange="markDirty()"></div>
+          <div class="field"><div class="field-label">حداکثر حساب از یه device</div><input class="inp lft" type="number" id="af-accounts" value="2" min="1" max="10" onchange="markDirty()"></div>
+        </div>
+        <div class="divider"></div>
+        <div style="display:flex;flex-direction:column;gap:12px">
+          <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px">اگه صدا Mute بود Reward نده</div><div style="font-size:11px;color:var(--mu)">کاربر باید واقعاً گوش بده</div></div><label class="stgl"><input type="checkbox" id="af-mute" checked onchange="markDirty()"><span class="stgl-s"></span></label></div>
+          <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px">اگه اپ background رفت Reward نده</div></div><label class="stgl"><input type="checkbox" id="af-bg" checked onchange="markDirty()"><span class="stgl-s"></span></label></div>
+          <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px">Challenge/Response برای هر session</div><div style="font-size:11px;color:var(--mu)">Bot نمیتونه حل کنه</div></div><label class="stgl"><input type="checkbox" id="af-challenge" checked onchange="markDirty()"><span class="stgl-s"></span></label></div>
+          <div style="display:flex;align-items:center;justify-content:space-between"><div><div style="font-size:13px">Behavioral Analysis</div><div style="font-size:11px;color:var(--mu)">بر اساس الگوی رفتار کاربر</div></div><label class="stgl"><input type="checkbox" id="af-behavioral" checked onchange="markDirty()"><span class="stgl-s"></span></label></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════ EXPORT ══════ -->
+  <div class="page" id="pg-export">
+    <div class="card">
+      <div class="card-hdr"><div class="card-ico" style="background:rgba(96,165,250,.12)"><i class="ti ti-download" style="color:var(--bl)"></i></div><div><div class="card-title">خروجی تنظیمات</div><div class="card-sub">فایل JSON برای backend</div></div></div>
+      <div class="card-body">
+        <div class="btn-row" style="margin-bottom:14px">
+          <button class="btn primary" onclick="copyJSON()"><i class="ti ti-copy"></i>کپی</button>
+          <button class="btn success" onclick="downloadConfig()"><i class="ti ti-download"></i>دانلود vibe-config.json</button>
+          <button class="btn subtle" onclick="downloadTracksJSON()"><i class="ti ti-download"></i>دانلود tracks.json</button>
+          <button class="btn subtle" onclick="document.getElementById('import-file').click()"><i class="ti ti-upload"></i>Import</button>
+          <input type="file" id="import-file" accept=".json" style="display:none" onchange="importConfig(this)">
+        </div>
+        <textarea id="json-out" readonly style="width:100%;height:360px;background:var(--bg3);border:.5px solid var(--b2);border-radius:var(--r);color:var(--tx);font-family:monospace;font-size:12px;padding:14px;outline:none;resize:vertical;line-height:1.6"></textarea>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /main -->
+</div><!-- /layout -->
+
+<!-- MODAL: Add Artist -->
+<div class="modal-ov" id="modal-artist" onclick="if(event.target===this)closeModal('modal-artist')">
+  <div class="modal">
+    <div class="modal-title">آرتیست جدید <button class="modal-close" onclick="closeModal('modal-artist')"><i class="ti ti-x"></i></button></div>
+    <div class="field"><div class="field-label">ایمیل *</div><input class="inp" id="art-email" type="email" placeholder="artist@example.com" dir="ltr"></div>
+    <div class="field"><div class="field-label">یوزرنیم *</div><input class="inp" id="art-username" type="text" placeholder="username" dir="ltr"></div>
+    <div class="field"><div class="field-label">رمز اولیه *</div><input class="inp" id="art-pass" type="text" placeholder="حداقل ۶ کاراکتر" dir="ltr"></div>
+    <div class="btn-row">
+      <button class="btn primary" onclick="createArtist()"><i class="ti ti-plus"></i>ساخت حساب</button>
+      <button class="btn subtle" onclick="closeModal('modal-artist')">انصراف</button>
+    </div>
+    <div class="err-box" id="art-err"></div>
+  </div>
+</div>
+
+<div class="toast-wrap" id="toast-wrap"></div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  VIBE ADMIN — Complete Management System
+// ══════════════════════════════════════════════════
+
+const API = 'http://127.0.0.1:8000/api';
+const CFG_KEY = 'vibe_admin_cfg_v1';
+let TOKEN = localStorage.getItem('vibe_admin_token') || null;
+let isDirty = false;
+
+// ── Default Config ──────────────────────────────
+const DEFAULTS = {
+  // Coins
+  cListen:10, cListenXp:20, cListenOn:true,
+  cSponsored:20, cSponsoredXp:20, cSponsoredOn:true,
+  cVideo:20, cVideoXp:30, cVideoOn:true,
+  cLike:5, cLikeXp:10, cLikeOn:true,
+  cSave:3, cSaveXp:5, cSaveOn:true,
+  cShare:15, cShareXp:15, cShareOn:true,
+  cFollow:10, cFollowXp:20, cFollowOn:true,
+  cDownload:5, cDownloadXp:10, cDownloadOn:true,
+  cReferral:100, cReferralXp:50, cReferralOn:true,
+  cEarly:25, cEarlyXp:30,
+  cMinPct:85, cDailyLimit:3, cTomanRate:15,
+  // Missions
+  mListenT:5, mListenC:50, mListenXp:50, mListenOn:true,
+  mLikeT:3, mLikeC:30, mLikeXp:30, mLikeOn:true,
+  mShareT:1, mShareC:20, mShareXp:20, mShareOn:true,
+  mWeeklyT:20, mWeeklyC:500, mWeeklyXp:200, mWeeklyOn:true,
+  // Revenue
+  revArtist:70, revPlatform:20, revListener:10,
+  feeWd:5, feeArt:3, feeCamp:10,
+  // Anti-Fraud
+  afDevice:50, afIp:200, afAccounts:2,
+  afMute:true, afBg:true, afChallenge:true, afBehavioral:true,
+};
+let C = (() => { try { return {...DEFAULTS,...JSON.parse(localStorage.getItem(CFG_KEY)||'{}')}; } catch { return {...DEFAULTS}; }})();
+
+// uploaded tracks (local storage until backend)
+let LOCAL_TRACKS = (() => { try { return JSON.parse(localStorage.getItem('vibe_admin_tracks')||'[]'); } catch { return []; }})();
+let SENT_NOTIFS  = (() => { try { return JSON.parse(localStorage.getItem('vibe_admin_notifs')||'[]'); } catch { return []; }})();
+let LOCAL_ARTISTS= (() => { try { return JSON.parse(localStorage.getItem('vibe_admin_artists')||'[]'); } catch { return []; }})();
+let LOCAL_WD     = (() => { try { return JSON.parse(localStorage.getItem('vibe_admin_wd')||'[]'); } catch { return []; }})();
+
+const saveLocalTracks = () => localStorage.setItem('vibe_admin_tracks', JSON.stringify(LOCAL_TRACKS));
+const saveSentNotifs  = () => localStorage.setItem('vibe_admin_notifs', JSON.stringify(SENT_NOTIFS));
+const saveLocalArtists= () => localStorage.setItem('vibe_admin_artists', JSON.stringify(LOCAL_ARTISTS));
+const saveLocalWD     = () => localStorage.setItem('vibe_admin_wd', JSON.stringify(LOCAL_WD));
+
+// ── API Helper ──────────────────────────────────
+async function api(method, path, body=null, isForm=false) {
+  const headers = {};
+  if (TOKEN) headers['Authorization'] = 'Bearer ' + TOKEN;
+  if (body && !isForm) headers['Content-Type'] = 'application/json';
+  try {
+    const res = await fetch(API + path, {
+      method, headers,
+      body: isForm ? body : (body ? JSON.stringify(body) : null),
+    });
+    const data = await res.json().catch(() => null);
+    if (!res.ok) throw new Error(data?.detail || 'خطای سرور: ' + res.status);
+    return data;
+  } catch(e) {
+    throw e;
+  }
+}
+
+// ── Check API ───────────────────────────────────
+let API_OK = false;
+async function checkAPI() {
+  try {
+    const r = await fetch(API.replace('/api','') + '/health', {signal: AbortSignal.timeout(3000)});
+    API_OK = r.ok;
+  } catch { API_OK = false; }
+  const dot = document.getElementById('api-dot');
+  const status = document.getElementById('api-status');
+  const dashApi = document.getElementById('dash-api');
+  const dashApiUrl = document.getElementById('dash-api-url');
+  if (API_OK) {
+    dot.className = 'api-dot on';
+    status.textContent = 'Backend متصله';
+    if (dashApi) { dashApi.textContent = '✅'; dashApiUrl.textContent = 'localhost:8000'; }
+  } else {
+    dot.className = 'api-dot off';
+    status.textContent = 'Backend آفلاین — Local Mode';
+    if (dashApi) { dashApi.textContent = '⚠️'; dashApiUrl.textContent = 'اجرا نشده'; }
+  }
+  return API_OK;
+}
+
+// ── Upload files ─────────────────────────────────
+let selectedAudio = null, selectedCover = null, selectedVideo = null;
+
+function handleAudioSelect(input) {
+  const f = input.files[0]; if (!f) return;
+  selectedAudio = f;
+  document.getElementById('audio-preview').classList.add('show');
+  document.getElementById('audio-filename').textContent = f.name;
+  document.getElementById('audio-filesize').textContent = (f.size/1024/1024).toFixed(2) + ' MB';
+  // auto-fill title
+  const raw = f.name.replace(/\.[^/.]+$/, '');
+  const sep = [' - ', ' – ', '_-_'].find(s => raw.includes(s));
+  if (sep) {
+    const p = raw.split(sep);
+    if (!document.getElementById('um-artist').value) document.getElementById('um-artist').value = p[0].trim();
+    if (!document.getElementById('um-title').value) document.getElementById('um-title').value = p.slice(1).join(sep).trim();
+  } else if (!document.getElementById('um-title').value) {
+    document.getElementById('um-title').value = raw;
+  }
+}
+function handleCoverSelect(input) {
+  const f = input.files[0]; if (!f) return;
+  selectedCover = f;
+  const url = URL.createObjectURL(f);
+  document.getElementById('cover-preview').classList.add('show');
+  document.getElementById('cover-img').src = url;
+  document.getElementById('cover-filename').textContent = f.name;
+}
+function handleVideoSelect(input) {
+  const f = input.files[0]; if (!f) return;
+  selectedVideo = f;
+  document.getElementById('video-preview').classList.add('show');
+  document.getElementById('video-filename').textContent = f.name;
+  document.getElementById('video-filesize').textContent = (f.size/1024/1024).toFixed(2) + ' MB';
+}
+function clearAudio() { selectedAudio=null; document.getElementById('audio-inp').value=''; document.getElementById('audio-preview').classList.remove('show'); }
+function clearCover() { selectedCover=null; document.getElementById('cover-inp').value=''; document.getElementById('cover-preview').classList.remove('show'); }
+function clearVideo() { selectedVideo=null; document.getElementById('video-inp').value=''; document.getElementById('video-preview').classList.remove('show'); }
+
+async function uploadTrack() {
+  const title  = document.getElementById('um-title').value.trim();
+  const artist = document.getElementById('um-artist').value.trim();
+  const err    = document.getElementById('upload-err');
+  err.classList.remove('show');
+
+  if (!selectedAudio) { showErr(err, '⚠️ فایل صوتی رو انتخاب کن'); return; }
+  if (!title)          { showErr(err, '⚠️ عنوان ترک رو وارد کن'); return; }
+  if (!artist)         { showErr(err, '⚠️ نام آرتیست رو وارد کن'); return; }
+
+  const btn = document.getElementById('upload-btn');
+  btn.innerHTML = '<span class="spin"></span> در حال آپلود...';
+  btn.disabled = true;
+
+  try {
+    // audio URL (local blob یا backend)
+    let audioUrl = '', coverUrl = '';
+
+    if (API_OK) {
+      // آپلود به backend
+      showProgress(0, 'آپلود فایل صوتی...');
+      const fd = new FormData();
+      fd.append('title', title);
+      fd.append('genre', document.getElementById('um-genre').value);
+      fd.append('mood',  document.getElementById('um-mood').value);
+      fd.append('lyrics',document.getElementById('um-lyrics').value);
+      fd.append('audio', selectedAudio);
+      if (selectedCover) fd.append('cover', selectedCover);
+
+      // اگه token نداری، اول ادمین رو لاگین کن
+      if (!TOKEN) {
+        const loginRes = await api('POST', '/auth/login', {email:'admin@vibe.ir', password:'admin123'}).catch(() => null);
+        if (loginRes?.token) { TOKEN = loginRes.token; localStorage.setItem('vibe_admin_token', TOKEN); }
+      }
+
+      showProgress(40, 'در حال پردازش...');
+      const res = await api('POST', '/artist/upload-track', fd, true);
+      audioUrl = res.audio_url;
+      coverUrl = res.cover_url || '';
+      showProgress(100, 'آپلود شد!');
+      toast('✅ ترک با موفقیت آپلود شد', 'success');
+    } else {
+      // Local mode — ذخیره به عنوان blob URL
+      audioUrl = URL.createObjectURL(selectedAudio);
+      if (selectedCover) coverUrl = URL.createObjectURL(selectedCover);
+      toast('⚠️ Backend آفلاین — ترک Local ذخیره شد', 'warn');
+    }
+
+    // ساخت track object
+    const links = [];
+    if (document.getElementById('um-spotify').value) links.push({name:'Spotify',icon:'🎵',color:'#1DB954',followers:'—',url:document.getElementById('um-spotify').value});
+    if (document.getElementById('um-instagram').value) links.push({name:'Instagram',icon:'📷',color:'#E1306C',followers:'—',url:document.getElementById('um-instagram').value});
+    if (document.getElementById('um-youtube').value) links.push({name:'YouTube',icon:'▶️',color:'#FF0000',followers:'—',url:document.getElementById('um-youtube').value});
+    if (document.getElementById('um-soundcloud').value) links.push({name:'SoundCloud',icon:'☁️',color:'#FF5500',followers:'—',url:document.getElementById('um-soundcloud').value});
+
+    const type = document.getElementById('um-type').value;
+    const track = {
+      id: 't' + Date.now(),
+      title, artist,
+      artistId: artist.toLowerCase().replace(/\s+/g,'_'),
+      genre: document.getElementById('um-genre').value,
+      emoji: '🎵',
+      color: '#1a0a3d',
+      duration: 180,
+      reward: parseInt(document.getElementById('um-reward').value) || 10,
+      videoReward: parseInt(document.getElementById('um-video-reward').value) || 0,
+      badge: type==='sponsored'?'sp':type==='early'?'new':'hot',
+      badgeLabel: type==='sponsored'?'💼 Sponsored':type==='early'?'✨ Early':'🔥 New',
+      earnText: `کامل گوش بده و +${document.getElementById('um-reward').value} Coin بگیر`,
+      earnType: type==='early'?'early':'normal',
+      hasVideo: parseInt(document.getElementById('um-video-reward').value) > 0,
+      audioUrl, coverUrl,
+      lyrics: document.getElementById('um-lyrics').value,
+      links,
+      addedAt: Date.now(),
+      status: 'approved',
+    };
+
+    LOCAL_TRACKS.unshift(track);
+    saveLocalTracks();
+    document.getElementById('sb-tracks-count').textContent = LOCAL_TRACKS.length;
+    clearUploadForm();
+    loadRecentUploads();
+    toast('🎵 ترک "' + title + '" اضافه شد', 'success');
+  } catch(e) {
+    showErr(err, '❌ ' + e.message);
+  }
+  btn.innerHTML = '<i class="ti ti-upload"></i>آپلود ترک';
+  btn.disabled = false;
+  hideProgress();
+}
+
+function showProgress(pct, text) {
+  document.getElementById('upload-progress').style.display = '';
+  document.getElementById('upload-status-text').textContent = text;
+  document.getElementById('upload-progress-fill').style.width = pct + '%';
+}
+function hideProgress() { document.getElementById('upload-progress').style.display = 'none'; }
+
+function clearUploadForm() {
+  clearAudio(); clearCover();
+  ['um-title','um-artist','um-lyrics','um-spotify','um-instagram','um-youtube','um-soundcloud'].forEach(id => { const el=document.getElementById(id); if(el)el.value=''; });
+  document.getElementById('um-reward').value = '10';
+  document.getElementById('um-video-reward').value = '0';
+}
+
+async function uploadVideo() {
+  const trackId = document.getElementById('uv-track').value;
+  const reward  = parseInt(document.getElementById('uv-reward').value) || 20;
+  const tab     = document.getElementById('video-tab-file').style.display !== 'none' ? 'file' : 'url';
+  const videoUrl= tab === 'url' ? document.getElementById('uv-url').value.trim() : '';
+
+  if (!trackId) { toast('⚠️ ترک رو انتخاب کن', 'error'); return; }
+  if (tab === 'file' && !selectedVideo) { toast('⚠️ فایل ویدیو رو انتخاب کن', 'error'); return; }
+  if (tab === 'url' && !videoUrl) { toast('⚠️ URL ویدیو رو وارد کن', 'error'); return; }
+
+  const t = LOCAL_TRACKS.find(x => x.id === trackId);
+  if (t) {
+    t.hasVideo = true;
+    t.videoReward = reward;
+    if (tab === 'url') t.videoUrl = videoUrl;
+    else if (selectedVideo) t.videoUrl = URL.createObjectURL(selectedVideo);
+    saveLocalTracks();
+    toast('✅ ویدیو به "' + t.title + '" اضافه شد', 'success');
+    clearVideo();
+    document.getElementById('uv-url').value = '';
+  }
+}
+
+function switchVideoTab(tab) {
+  document.getElementById('video-tab-file').style.display = tab === 'file' ? '' : 'none';
+  document.getElementById('video-tab-url').style.display  = tab === 'url'  ? '' : 'none';
+  document.getElementById('vt-file').style.background = tab === 'file' ? 'var(--pu2)' : 'var(--bg3)';
+  document.getElementById('vt-file').style.color      = tab === 'file' ? '#fff' : 'var(--mu)';
+  document.getElementById('vt-url').style.background  = tab === 'url'  ? 'var(--pu2)' : 'var(--bg3)';
+  document.getElementById('vt-url').style.color       = tab === 'url'  ? '#fff' : 'var(--mu)';
+}
+
+// ── Tracks Table ────────────────────────────────
+let allTracks = [], filteredTracks = [];
+async function loadTracks() {
+  allTracks = [...LOCAL_TRACKS];
+  if (API_OK) {
+    try {
+      const apiTracks = await api('GET', '/tracks/');
+      apiTracks.forEach(t => { if (!allTracks.find(x => x.id === t.id)) allTracks.push(t); });
+    } catch {}
+  }
+  filteredTracks = [...allTracks];
+  document.getElementById('sb-tracks-count').textContent = allTracks.length;
+  renderTracksTable(filteredTracks);
+  populateVideoTrackSelect();
+  loadDashStats();
+}
+function filterTracks(q) {
+  filteredTracks = q.trim() ? allTracks.filter(t => t.title?.toLowerCase().includes(q.toLowerCase()) || t.artist?.toLowerCase().includes(q.toLowerCase())) : [...allTracks];
+  renderTracksTable(filteredTracks);
+}
+function renderTracksTable(tracks) {
+  const el = document.getElementById('tracks-table');
+  if (!tracks.length) { el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--mu);font-size:13px">ترکی پیدا نشد</div>'; return; }
+  el.innerHTML = `<div style="overflow-x:auto"><table class="tbl">
+    <thead><tr><th>ترک</th><th>آرتیست</th><th>ژانر</th><th>Reward</th><th>ویدیو</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+    <tbody>${tracks.map(t => `<tr>
+      <td><div style="display:flex;align-items:center;gap:9px">
+        ${t.coverUrl ? `<img src="${t.coverUrl}" style="width:36px;height:36px;border-radius:8px;object-fit:cover">` : `<div style="width:36px;height:36px;border-radius:8px;background:${t.color||'var(--bg3)'};display:flex;align-items:center;justify-content:center">${t.emoji||'🎵'}</div>`}
+        <div><div style="font-size:13px;font-weight:500">${esc(t.title||'')}</div><div style="font-size:10px;color:var(--mu)">${t.id}</div></div>
+      </div></td>
+      <td>${esc(t.artist||'')}</td>
+      <td>${t.genre||'—'}</td>
+      <td><span style="color:var(--am);font-weight:600">+${t.reward||0} 🪙</span></td>
+      <td>${t.hasVideo ? `<span class="badge green"><i class="ti ti-check" style="font-size:11px"></i>دارد</span>` : '<span class="badge" style="background:var(--bg3);color:var(--mu)">ندارد</span>'}</td>
+      <td><span class="badge ${t.status==='approved'?'green':t.status==='rejected'?'red':'amber'}">${t.status==='approved'?'تأیید':t.status==='rejected'?'رد':'بررسی'}</span></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn subtle" onclick="editTrack('${t.id}')" style="padding:4px 10px;font-size:11px"><i class="ti ti-edit"></i></button>
+        <button class="btn danger" onclick="deleteTrack('${t.id}')" style="padding:4px 10px;font-size:11px"><i class="ti ti-trash"></i></button>
+      </div></td>
+    </tr>`).join('')}</tbody>
+  </table></div>`;
+}
+function editTrack(id) {
+  const t = LOCAL_TRACKS.find(x => x.id === id);
+  if (!t) { toast('ترک فقط از backend قابل ویرایشه', 'warn'); return; }
+  const newReward = prompt('Coin Reward جدید:', t.reward);
+  if (newReward !== null && !isNaN(newReward)) {
+    t.reward = parseInt(newReward);
+    saveLocalTracks();
+    loadTracks();
+    toast('✅ ذخیره شد', 'success');
+  }
+}
+function deleteTrack(id) {
+  if (!confirm('مطمئنی؟')) return;
+  LOCAL_TRACKS = LOCAL_TRACKS.filter(x => x.id !== id);
+  saveLocalTracks();
+  loadTracks();
+  toast('🗑️ ترک حذف شد');
+}
+function loadRecentUploads() {
+  const el = document.getElementById('recent-uploads');
+  if (!LOCAL_TRACKS.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--mu);font-size:13px">هنوز ترکی آپلود نشده</div>'; return; }
+  el.innerHTML = `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>ترک</th><th>آرتیست</th><th>تاریخ</th><th>عملیات</th></tr></thead><tbody>
+    ${LOCAL_TRACKS.slice(0,5).map(t => `<tr>
+      <td>${esc(t.title)}</td><td>${esc(t.artist)}</td>
+      <td>${ago(t.addedAt)}</td>
+      <td><button class="btn danger" onclick="deleteTrack('${t.id}')" style="padding:4px 10px;font-size:11px"><i class="ti ti-trash"></i></button></td>
+    </tr>`).join('')}
+  </tbody></table></div>`;
+}
+function populateVideoTrackSelect() {
+  const sel = document.getElementById('uv-track');
+  sel.innerHTML = '<option value="">انتخاب ترک...</option>' + LOCAL_TRACKS.map(t => `<option value="${t.id}">${esc(t.title)} — ${esc(t.artist)}</option>`).join('');
+}
+function loadDashStats() {
+  document.getElementById('dash-tracks').textContent = allTracks.length;
+  const wd = LOCAL_WD.filter(w => w.status === 'pending').length;
+  document.getElementById('dash-wd').textContent = wd;
+  document.getElementById('sb-wd-count').textContent = wd || '';
+  document.getElementById('sb-wd-count').style.display = wd ? '' : 'none';
+  renderDashRecentTracks();
+}
+function renderDashRecentTracks() {
+  const el = document.getElementById('dash-recent-tracks');
+  if (!LOCAL_TRACKS.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--mu);font-size:13px">هنوز ترکی اضافه نشده</div>'; return; }
+  el.innerHTML = `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>ترک</th><th>آرتیست</th><th>Reward</th><th>زمان</th></tr></thead><tbody>
+    ${LOCAL_TRACKS.slice(0,5).map(t => `<tr>
+      <td>${esc(t.title)}</td><td>${esc(t.artist)}</td>
+      <td><span style="color:var(--am);font-weight:600">+${t.reward} 🪙</span></td>
+      <td>${ago(t.addedAt)}</td>
+    </tr>`).join('')}
+  </tbody></table></div>`;
+}
+
+// ── Artists ─────────────────────────────────────
+function loadArtists() {
+  const el = document.getElementById('artists-table');
+  if (!LOCAL_ARTISTS.length) { el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--mu);font-size:13px">هنوز آرتیستی ثبت نشده<br><br><button class="btn primary" onclick="openAddArtistModal()"><i class="ti ti-plus"></i>آرتیست اضافه کن</button></div>'; return; }
+  el.innerHTML = `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>آرتیست</th><th>ایمیل</th><th>ترک‌ها</th><th>وضعیت</th><th>عملیات</th></tr></thead><tbody>
+    ${LOCAL_ARTISTS.map(a => `<tr>
+      <td><div style="font-size:13px;font-weight:500">${esc(a.username)}</div></td>
+      <td style="font-size:12px;color:var(--mu);direction:ltr;text-align:left">${esc(a.email)}</td>
+      <td>${LOCAL_TRACKS.filter(t=>t.artistId===a.username||t.artist===a.username).length}</td>
+      <td><span class="badge ${a.active?'green':'red'}">${a.active?'فعال':'غیرفعال'}</span></td>
+      <td><div style="display:flex;gap:6px">
+        <button class="btn subtle" onclick="toggleArtist('${a.id}')" style="padding:4px 10px;font-size:11px">${a.active?'غیرفعال':'فعال'}</button>
+        <button class="btn danger" onclick="deleteArtist('${a.id}')" style="padding:4px 10px;font-size:11px"><i class="ti ti-trash"></i></button>
+      </div></td>
+    </tr>`).join('')}
+  </tbody></table></div>`;
+}
+function openAddArtistModal() { document.getElementById('modal-artist').classList.add('on'); document.getElementById('art-err').classList.remove('show'); }
+function closeModal(id) { document.getElementById(id).classList.remove('on'); }
+async function createArtist() {
+  const email = document.getElementById('art-email').value.trim();
+  const username = document.getElementById('art-username').value.trim();
+  const pass = document.getElementById('art-pass').value;
+  const err = document.getElementById('art-err');
+  err.classList.remove('show');
+  if (!email || !username || !pass) { showErr(err, '⚠️ همه فیلدها رو پر کن'); return; }
+
+  try {
+    if (API_OK) {
+      await api('POST', '/auth/register', {email, username, password: pass});
+      toast('✅ حساب آرتیست ساخته شد', 'success');
+    }
+    const artist = {id:'a'+Date.now(), email, username, active:true, createdAt:Date.now()};
+    LOCAL_ARTISTS.push(artist);
+    saveLocalArtists();
+    closeModal('modal-artist');
+    loadArtists();
+    toast('✅ آرتیست "' + username + '" اضافه شد', 'success');
+  } catch(e) {
+    showErr(err, '❌ ' + e.message);
+  }
+}
+function toggleArtist(id) {
+  const a = LOCAL_ARTISTS.find(x=>x.id===id); if (!a) return;
+  a.active = !a.active; saveLocalArtists(); loadArtists();
+  toast(a.active ? '✅ فعال شد' : '⛔ غیرفعال شد');
+}
+function deleteArtist(id) {
+  if (!confirm('مطمئنی؟')) return;
+  LOCAL_ARTISTS = LOCAL_ARTISTS.filter(x=>x.id!==id); saveLocalArtists(); loadArtists();
+  toast('🗑️ آرتیست حذف شد');
+}
+
+// ── Users ────────────────────────────────────────
+async function loadUsers() {
+  const el = document.getElementById('users-table');
+  if (!API_OK) { el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--mu);font-size:13px">⚠️ برای مدیریت کاربران، backend باید روشن باشه</div>'; return; }
+  try {
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--mu)"><div class="spin" style="width:24px;height:24px;border-width:3px"></div></div>';
+    // در production: GET /api/admin/users
+    el.innerHTML = '<div style="padding:40px;text-align:center;color:var(--mu);font-size:13px">لیست کاربران از backend در نسخه بعدی</div>';
+  } catch {}
+}
+
+// ── Notifications ───────────────────────────────
+function previewNotif() {
+  const icons = {system:'⚙️',coin:'🪙',mission:'🎯',artist:'🎵',new_track:'🎵'};
+  const type = document.getElementById('notif-type').value;
+  document.getElementById('notif-prev-ico').textContent = icons[type] || '🔔';
+  document.getElementById('notif-prev-title').textContent = document.getElementById('notif-title').value || '—';
+  document.getElementById('notif-prev-body').textContent = document.getElementById('notif-body').value || '—';
+  document.getElementById('notif-preview-box').style.display = '';
+}
+async function sendNotification() {
+  const title  = document.getElementById('notif-title').value.trim();
+  const body   = document.getElementById('notif-body').value.trim();
+  if (!title || !body) { toast('⚠️ عنوان و متن رو پر کن', 'error'); return; }
+
+  const notif = {
+    id: 'notif_' + Date.now(),
+    title, sub: body,
+    type: document.getElementById('notif-type').value,
+    target: document.getElementById('notif-target').value,
+    action: document.getElementById('notif-action').value || null,
+    sentAt: Date.now(),
+  };
+
+  // Send via API if available
+  if (API_OK) {
+    try {
+      // در production: POST /api/admin/send-notification
+      toast('📡 در حال ارسال از backend...', 'warn');
+    } catch {}
+  }
+
+  SENT_NOTIFS.unshift(notif);
+  if (SENT_NOTIFS.length > 50) SENT_NOTIFS = SENT_NOTIFS.slice(0, 50);
+  saveSentNotifs();
+  renderNotifHistory();
+  // clear
+  document.getElementById('notif-title').value = '';
+  document.getElementById('notif-body').value = '';
+  document.getElementById('notif-preview-box').style.display = 'none';
+  const targetLabel = {all:'همه کاربران',artists:'آرتیست‌ها',active:'کاربران فعال'}[notif.target];
+  toast('🔔 نوتیف به ' + targetLabel + ' ارسال شد', 'success');
+}
+function renderNotifHistory() {
+  const el = document.getElementById('notif-history');
+  if (!SENT_NOTIFS.length) { el.innerHTML = '<div style="padding:20px;text-align:center;color:var(--mu);font-size:13px">هنوز نوتیفی ارسال نشده</div>'; return; }
+  const icons = {system:'⚙️',coin:'🪙',mission:'🎯',artist:'🎵',new_track:'🎵'};
+  const bgc = {system:'rgba(144,144,184,.1)',coin:'rgba(251,191,36,.1)',mission:'rgba(124,58,237,.1)',artist:'rgba(52,211,153,.1)',new_track:'rgba(52,211,153,.1)'};
+  el.innerHTML = SENT_NOTIFS.map(n => `<div class="notif-sent">
+    <div class="notif-ico" style="background:${bgc[n.type]||'var(--bg3)'}">${icons[n.type]||'🔔'}</div>
+    <div style="flex:1"><div style="font-size:13px;font-weight:500">${esc(n.title)}</div><div style="font-size:11px;color:var(--mu);margin-top:2px">${esc(n.sub)}</div><div style="font-size:10px;color:var(--mu);margin-top:4px">${ago(n.sentAt)} · ${n.target==='all'?'همه':n.target==='artists'?'آرتیست‌ها':'کاربران فعال'}</div></div>
+  </div>`).join('');
+}
+function clearNotifHistory() { SENT_NOTIFS = []; saveSentNotifs(); renderNotifHistory(); toast('🗑️ تاریخچه پاک شد'); }
+
+// ── Withdrawals ─────────────────────────────────
+function loadWithdrawals() {
+  const filter = document.getElementById('wd-filter').value;
+  const filtered = LOCAL_WD.filter(w => w.status === filter);
+  const el = document.getElementById('wd-table');
+  document.getElementById('wd-pending-count').textContent = LOCAL_WD.filter(w=>w.status==='pending').length;
+
+  if (!filtered.length) {
+    el.innerHTML = `<div style="padding:40px;text-align:center;color:var(--mu);font-size:13px">
+      هیچ درخواست "${filter}" ای نیست<br><br>
+      <button class="btn subtle" onclick="addTestWD()"><i class="ti ti-plus"></i>اضافه کردن نمونه تستی</button>
+    </div>`;
+    return;
+  }
+  el.innerHTML = `<div style="overflow-x:auto"><table class="tbl"><thead><tr><th>کاربر</th><th>مبلغ</th><th>شماره کارت</th><th>زمان</th><th>وضعیت</th><th>عملیات</th></tr></thead>
+    <tbody>${filtered.map(w => `<tr>
+      <td>${esc(w.username||'—')}</td>
+      <td><b style="color:var(--am)">${(w.amount_toman||0).toLocaleString()} تومان</b><br><span style="font-size:10px;color:var(--mu)">${w.amount_coin||0} Coin</span></td>
+      <td style="direction:ltr;text-align:left;font-size:12px">${esc(w.bank_card||'—')}</td>
+      <td>${ago(w.createdAt)}</td>
+      <td><span class="badge ${w.status==='approved'||w.status==='paid'?'green':w.status==='rejected'?'red':'amber'}">${w.status==='pending'?'pending':w.status==='approved'?'تأیید':w.status==='paid'?'پرداخت':w.status==='rejected'?'رد':w.status}</span></td>
+      <td><div style="display:flex;gap:6px">
+        ${w.status==='pending'?`<button class="btn success" onclick="approveWD('${w.id}')" style="padding:4px 10px;font-size:11px"><i class="ti ti-check"></i>تأیید</button><button class="btn danger" onclick="rejectWD('${w.id}')" style="padding:4px 10px;font-size:11px"><i class="ti ti-x"></i>رد</button>`:'—'}
+      </div></td>
+    </tr>`).join('')}
+  </tbody></table></div>`;
+}
+function addTestWD() {
+  LOCAL_WD.push({id:'wd'+Date.now(),username:'testuser',amount_coin:500,amount_toman:7500,bank_card:'6037-9911-1234-5678',status:'pending',createdAt:Date.now()});
+  saveLocalWD();loadWithdrawals();loadDashStats();toast('🧪 یه درخواست تستی اضافه شد');
+}
+function approveWD(id) {
+  const w = LOCAL_WD.find(x=>x.id===id); if (!w) return;
+  w.status = 'approved'; saveLocalWD(); loadWithdrawals(); loadDashStats();
+  toast('✅ برداشت تأیید شد', 'success');
+}
+function rejectWD(id) {
+  const w = LOCAL_WD.find(x=>x.id===id); if (!w) return;
+  w.status = 'rejected'; saveLocalWD(); loadWithdrawals(); loadDashStats();
+  toast('❌ برداشت رد شد');
+}
+
+// ── Revenue ─────────────────────────────────────
+function syncRev(changed) {
+  const a=document.getElementById('rev-artist'), p=document.getElementById('rev-platform'), l=document.getElementById('rev-listener');
+  let av=+a.value,pv=+p.value,lv=+l.value;
+  if(changed==='artist'){const rem=100-av;pv=Math.round(rem*pv/Math.max(pv+lv,1));lv=100-av-pv;}
+  else if(changed==='platform'){const rem=100-pv;av=Math.round(rem*av/Math.max(av+lv,1));lv=100-pv-av;}
+  else if(changed==='listener'){const rem=100-lv;av=Math.round(rem*av/Math.max(av+pv,1));pv=100-lv-av;}
+  av=Math.max(0,Math.min(100,av));pv=Math.max(0,Math.min(100,pv));lv=Math.max(0,Math.min(100,lv));
+  const diff=100-av-pv-lv;av+=diff;
+  a.value=av;p.value=pv;l.value=lv;
+  document.getElementById('rev-artist-v').textContent=av+'%';
+  document.getElementById('rev-platform-v').textContent=pv+'%';
+  document.getElementById('rev-listener-v').textContent=lv+'%';
+  const ok=av+pv+lv===100;
+  document.getElementById('rev-check').innerHTML=ok
+    ?`<span style="color:var(--gr)">✅ مجموع = 100٪</span><br>آرتیست: <b style="color:var(--gr)">${av}٪</b> | Vibe: <b style="color:var(--pu)">${pv}٪</b> | شنونده: <b style="color:var(--am)">${lv}٪</b>`
+    :`<span style="color:var(--re)">❌ مجموع = ${av+pv+lv}٪ — باید ۱۰۰ باشه</span>`;
+}
+
+// ── Config Fields ────────────────────────────────
+const BINDINGS = [
+  ['c-listen','cListen','n'],['c-listen-xp','cListenXp','n'],['c-listen-on','cListenOn','cb'],
+  ['c-sponsored','cSponsored','n'],['c-sponsored-xp','cSponsoredXp','n'],['c-sponsored-on','cSponsoredOn','cb'],
+  ['c-video','cVideo','n'],['c-video-xp','cVideoXp','n'],['c-video-on','cVideoOn','cb'],
+  ['c-like','cLike','n'],['c-like-xp','cLikeXp','n'],['c-like-on','cLikeOn','cb'],
+  ['c-save','cSave','n'],['c-save-xp','cSaveXp','n'],['c-save-on','cSaveOn','cb'],
+  ['c-share','cShare','n'],['c-share-xp','cShareXp','n'],['c-share-on','cShareOn','cb'],
+  ['c-follow','cFollow','n'],['c-follow-xp','cFollowXp','n'],['c-follow-on','cFollowOn','cb'],
+  ['c-download','cDownload','n'],['c-download-xp','cDownloadXp','n'],['c-download-on','cDownloadOn','cb'],
+  ['c-referral','cReferral','n'],['c-referral-xp','cReferralXp','n'],['c-referral-on','cReferralOn','cb'],
+  ['c-early','cEarly','n'],['c-early-xp','cEarlyXp','n'],
+  ['c-min-pct','cMinPct','r'],['c-daily-limit','cDailyLimit','r'],['c-toman-rate','cTomanRate','n'],
+  ['m-listen-t','mListenT','n'],['m-listen-c','mListenC','n'],['m-listen-xp','mListenXp','n'],['m-listen-on','mListenOn','cb'],
+  ['m-like-t','mLikeT','n'],['m-like-c','mLikeC','n'],['m-like-xp','mLikeXp','n'],['m-like-on','mLikeOn','cb'],
+  ['m-share-t','mShareT','n'],['m-share-c','mShareC','n'],['m-share-xp','mShareXp','n'],['m-share-on','mShareOn','cb'],
+  ['m-weekly-t','mWeeklyT','n'],['m-weekly-c','mWeeklyC','n'],['m-weekly-xp','mWeeklyXp','n'],['m-weekly-on','mWeeklyOn','cb'],
+  ['rev-artist','revArtist','r'],['rev-platform','revPlatform','r'],['rev-listener','revListener','r'],
+  ['fee-wd','feeWd','r'],['fee-art','feeArt','r'],['fee-camp','feeCamp','r'],
+  ['af-device','afDevice','n'],['af-ip','afIp','n'],['af-accounts','afAccounts','n'],
+  ['af-mute','afMute','cb'],['af-bg','afBg','cb'],['af-challenge','afChallenge','cb'],['af-behavioral','afBehavioral','cb'],
+];
+function populateFields() {
+  BINDINGS.forEach(([id,key,type]) => {
+    const el = document.getElementById(id); if (!el) return;
+    if (type === 'cb') el.checked = !!C[key];
+    else { el.value = C[key]; if (type === 'r') updateRangeDisplay(id); }
+  });
+  syncRev(null);
+  updRange('c-min-pct','c-min-pct-v','%');
+  updRange('c-daily-limit','c-daily-limit-v','× در روز');
+  updRange('fee-wd','fee-wd-v','%');updRange('fee-art','fee-art-v','%');updRange('fee-camp','fee-camp-v','%');
+  document.getElementById('rev-check').innerHTML = `آرتیست: <b style="color:var(--gr)">${C.revArtist}٪</b> | Vibe: <b style="color:var(--pu)">${C.revPlatform}٪</b> | شنونده: <b style="color:var(--am)">${C.revListener}٪</b>`;
+}
+function collectFields() {
+  BINDINGS.forEach(([id,key,type]) => {
+    const el = document.getElementById(id); if (!el) return;
+    if (type === 'cb') C[key] = el.checked;
+    else if (type === 'r' || type === 'n') C[key] = Number(el.value);
+    else C[key] = el.value;
+  });
+}
+function updateRangeDisplay(id) {
+  const map = {
+    'c-min-pct':['c-min-pct-v','%'], 'c-daily-limit':['c-daily-limit-v','× در روز'],
+    'rev-artist':['rev-artist-v','%'],'rev-platform':['rev-platform-v','%'],'rev-listener':['rev-listener-v','%'],
+    'fee-wd':['fee-wd-v','%'],'fee-art':['fee-art-v','%'],'fee-camp':['fee-camp-v','%'],
+  };
+  if (map[id]) updRange(id, map[id][0], map[id][1]);
+}
+function updRange(id, valId, suffix) {
+  const r = document.getElementById(id), v = document.getElementById(valId);
+  if (r && v) v.textContent = r.value + suffix;
+}
+
+// ── Dirty / Save ─────────────────────────────────
+function markDirty() {
+  isDirty = true;
+  document.getElementById('unsaved-dot').style.display = 'block';
+  document.getElementById('discard-btn').style.display = '';
+  collectFields();
+}
+function discardChanges() {
+  populateFields(); isDirty = false;
+  document.getElementById('unsaved-dot').style.display = 'none';
+  document.getElementById('discard-btn').style.display = 'none';
+  toast('↩️ لغو شد', 'warn');
+}
+function saveAll() {
+  collectFields();
+  localStorage.setItem(CFG_KEY, JSON.stringify(C));
+  isDirty = false;
+  document.getElementById('unsaved-dot').style.display = 'none';
+  document.getElementById('discard-btn').style.display = 'none';
+  document.getElementById('last-save').textContent = new Date().toLocaleTimeString('fa-IR');
+  const btn = document.getElementById('save-btn');
+  btn.innerHTML = '<i class="ti ti-check"></i>ذخیره شد';
+  btn.style.background = 'var(--gr2)';btn.style.color = 'var(--gr)';
+  setTimeout(() => { btn.innerHTML = '<i class="ti ti-device-floppy" style="font-size:15px"></i>ذخیره'; btn.style.background='';btn.style.color=''; }, 1500);
+  toast('✅ همه تنظیمات ذخیره شد', 'success');
+  updJSON();
+}
+
+// ── Export ───────────────────────────────────────
+function updJSON() {
+  collectFields();
+  const out = JSON.stringify({config:C, tracks:LOCAL_TRACKS, artists:LOCAL_ARTISTS, exportedAt:new Date().toISOString()}, null, 2);
+  const el = document.getElementById('json-out'); if (el) el.value = out;
+}
+function copyJSON() { updJSON(); navigator.clipboard?.writeText(document.getElementById('json-out').value).catch(()=>{}); toast('📋 کپی شد', 'success'); }
+function downloadConfig() {
+  updJSON();
+  const a = document.createElement('a');
+  a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify({...C, exportedAt:new Date().toISOString()}, null, 2));
+  a.download = 'vibe-config.json'; a.click();
+  toast('⬇ vibe-config.json دانلود شد', 'success');
+}
+function downloadTracksJSON() {
+  const a = document.createElement('a');
+  a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(LOCAL_TRACKS, null, 2));
+  a.download = 'tracks.json'; a.click();
+  toast('⬇ tracks.json دانلود شد — این رو توی GitHub آپلود کن', 'success');
+}
+function importConfig(input) {
+  const f = input.files[0]; if (!f) return;
+  const r = new FileReader();
+  r.onload = e => {
+    try {
+      const d = JSON.parse(e.target.result);
+      if (d.config) C = {...DEFAULTS,...d.config};
+      if (d.tracks) { LOCAL_TRACKS = d.tracks; saveLocalTracks(); }
+      localStorage.setItem(CFG_KEY, JSON.stringify(C));
+      populateFields(); loadTracks();
+      toast('✅ Import شد', 'success');
+    } catch { toast('❌ فایل نامعتبره', 'error'); }
+  };
+  r.readAsText(f);
+}
+
+// ── Nav ───────────────────────────────────────────
+const PAGE_TITLES = {
+  dashboard:'داشبورد','upload-music':'آپلود موزیک','upload-video':'آپلود ویدیو',
+  tracks:'مدیریت ترک‌ها',artists:'آرتیست‌ها',users:'کاربران',
+  notifications:'ارسال نوتیفیکیشن',coins:'تنظیم Coin‌ها',
+  withdrawals:'مدیریت برداشت‌ها',revenue:'تقسیم درآمد',
+  anticheat:'Anti-Fraud',export:'خروجی JSON',
+};
+function showPage(id, item) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.sb-item').forEach(i=>i.classList.remove('on'));
+  document.getElementById('pg-'+id)?.classList.add('on');
+  item?.classList.add('on');
+  document.getElementById('topbar-title').textContent = PAGE_TITLES[id] || id;
+  if (id === 'tracks') loadTracks();
+  if (id === 'artists') loadArtists();
+  if (id === 'users') loadUsers();
+  if (id === 'withdrawals') loadWithdrawals();
+  if (id === 'upload-music') loadRecentUploads();
+  if (id === 'notifications') renderNotifHistory();
+  if (id === 'export') updJSON();
+  if (id === 'dashboard') { loadDashStats(); document.getElementById('dash-users').textContent = LOCAL_ARTISTS.length || '—'; }
+}
+
+// ── Helpers ───────────────────────────────────────
+function toast(msg, type='') {
+  const w = document.getElementById('toast-wrap'), t = document.createElement('div');
+  t.className = 'toast ' + type; t.textContent = msg; w.appendChild(t);
+  setTimeout(() => t.remove(), 3000);
+}
+function showErr(el, msg) { el.textContent = msg; el.classList.add('show'); }
+function esc(s) { return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function ago(ts) { if(!ts)return '—'; const d=(Date.now()-ts)/1000; if(d<60)return 'همین الان'; if(d<3600)return Math.floor(d/60)+' دقیقه پیش'; if(d<86400)return Math.floor(d/3600)+' ساعت پیش'; return Math.floor(d/86400)+' روز پیش'; }
+window.addEventListener('beforeunload', e => { if (isDirty) { e.preventDefault(); e.returnValue = ''; } });
+
+// ── INIT ─────────────────────────────────────────
+(async () => {
+  await checkAPI();
+  populateFields();
+  loadTracks();
+  renderNotifHistory();
+  loadWithdrawals();
+  document.getElementById('last-save').textContent = new Date().toLocaleTimeString('fa-IR');
+  setInterval(saveAll, 60000); // auto-save هر دقیقه
+  setInterval(checkAPI, 30000); // re-check API هر ۳۰ ثانیه
+})();
+</script>
+</body>
+</html>
